@@ -9,7 +9,12 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var isAnimating = false
+    @State private var showSecondScreend = false
     @State private var imageOffset: CGSize = .zero
+    @State private var buttonOffset: CGFloat = 0
+    
+    
+    let buttonHeight: CGFloat = 80
     
     var body: some View {
         GeometryReader { geometry in
@@ -36,7 +41,7 @@ struct HomeView: View {
                 
                 VStack {
                     Text("Chef Delivery")
-                        .font(.system(size: 40))
+                        .font(.system(size: 48))
                         .fontWeight(.heavy)
                         .foregroundColor(Color("ColorRed"))
                         .opacity(isAnimating ? 1 : 0)
@@ -54,7 +59,8 @@ struct HomeView: View {
                         .resizable()
                         .scaledToFit()
                         .shadow(radius: 60)
-                        .padding(32)
+                        .padding(isAnimating ? 32 : 92)
+                        .opacity(isAnimating ? 1 : 0)
                         .offset(x: imageOffset.width, y: imageOffset.height)
                         .gesture(
                             DragGesture()
@@ -71,13 +77,85 @@ struct HomeView: View {
                                 })
                         )
                     
-                    Spacer()
+                    ZStack {
+                        Capsule()
+                            .fill(Color("ColorRed").opacity(0.2))
+                        
+                        Capsule()
+                            .fill(Color("ColorRed").opacity(0.2))
+                            .padding(8)
+                        
+                        Text("Descubra Mais")
+                            .font(.title2)
+                            .bold()
+                            .foregroundColor(Color("ColorRedDark"))
+                            .offset(x: 20)
+                        
+                        
+                        HStack {
+                            Capsule()
+                                .fill(Color("ColorRed"))
+                                .frame(width: buttonOffset + buttonHeight)
+                                
+                            Spacer()
+                        }
+                        
+                        HStack {
+                            ZStack {
+                                Circle()
+                                    .fill(Color("ColorRed"))
+                                
+                                Circle()
+                                    .fill(Color("ColorRedDark"))
+                                    .padding(8)
+                                
+                                Image(systemName: "chevron.right.2")
+                                    .font(.system(size: 24))
+                                    .bold()
+                                    .foregroundColor(.white)
+                            }
+                            Spacer()
+                        }
+                        .offset(x: buttonOffset)
+                        .gesture(
+                            DragGesture()
+                                .onChanged({ gesture in
+                                    
+                                    if gesture.translation.width >= 0 && buttonOffset <= (geometry.size.width - 60) - buttonHeight {
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            buttonOffset = gesture.translation.width
+                                        }
+                                    }
+                                    
+                                })
+                                .onEnded({ _ in
+                                    
+                                    if buttonOffset > ( geometry.size.width - 60 ) / 2 {
+                                        showSecondScreend = true
+                                    } else {
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            buttonOffset = 0
+                                        }
+                                    }
+                                    
+                                    
+                                })
+                        )
+                        
+                        
+                    }
+                    .frame(width: (geometry.size.width - 60), height: buttonHeight)
+                    .opacity(isAnimating ? 1 : 0)
+                    .offset(y: isAnimating ? 0 : 100)
                 }
                 .onAppear {
                     withAnimation(.easeInOut(duration: 1)) {
                         isAnimating = true
                     }
                 }
+            }
+            .fullScreenCover(isPresented: $showSecondScreend) {
+                ContentView()
             }
         }
     }
