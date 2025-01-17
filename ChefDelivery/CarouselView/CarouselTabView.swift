@@ -29,7 +29,6 @@ struct CarouselTabView: View {
         .onAppear {
             Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
                 withAnimation(.easeInOut(duration: 1)) {
-                    print(currentIndex)
                     if currentIndex > ordersMock.count {
                         currentIndex = 1
                     }
